@@ -1,0 +1,1 @@
+-- This is fun, I would like to do it soon enough, am still thinking when tho

@@ -1,0 +1,1 @@
+-- The main menu where all the magic happens and that will connect all other Haskell files in one interactable, fun menu

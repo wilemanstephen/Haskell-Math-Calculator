@@ -146,3 +146,79 @@ module Temperature where
     rankineToNewton r =
         let n = (r - 491.67) * 11/60
         in show n ++ " N"
+
+    réaumurToCelsius :: Double -> String
+    réaumurToCelsius re =
+        let c = re * 1.25
+        in show c ++ " C"
+    
+    réaumurToFahrenheit :: Double -> String
+    réaumurToFahrenheit re =
+        let f = re * 2.25 + 32
+        in show f ++ " F"
+    
+    réaumurToKelvin :: Double -> String
+    réaumurToKelvin re =
+        let c = re * 1.25
+            k = c + 273.15
+        in show k ++ " K"
+    
+    réaumurToRankine :: Double -> String
+    réaumurToRankine re =
+        let c = re * 1.25
+            k = c + 273.15
+            r = k * 9/5
+        in show r ++ " R"
+    
+    réaumurToRømer :: Double -> String
+    réaumurToRømer re =
+        let ro = re * 21/32 + 7.5
+        in show ro ++ " Rø"
+    
+    réaumurToDelisle :: Double -> String
+    réaumurToDelisle re =
+        let c = re * 1.25
+            d = (100 - c) * 3/2
+        in show d ++ " D"
+    
+    réaumurToNewton :: Double -> String
+    réaumurToNewton re =
+        let n = re * 33/80
+        in show n ++ " N"
+    
+    rømerToCelsius :: Double -> String
+    rømerToCelsius ro =
+        let c = (ro - 7.5) * 40/21
+        in show c ++ " C"
+    
+    rømerToFahrenheit :: Double -> String
+    rømerToFahrenheit ro =
+        let f = (ro - 7.5) * 24/7 + 32
+        in show f ++ " F"
+    
+    rømerToKelvin :: Double -> String
+    rømerToKelvin ro =
+        let c = (ro - 7.5) * 40/21
+            k = c + 273.15
+        in show k ++ " K"
+
+    rømerToRankine :: Double -> String
+    rømerToRankine ro =
+        let r = (ro - 7.5) * 72/21 + 491.67
+        in show r ++ " R"
+    
+    rømerToRéaumur :: Double -> String
+    rømerToRéaumur ro =
+        let re = (ro - 7.5) * 32/21
+        in show re ++ " Ré"
+    
+    rømerToDelisle :: Double -> String
+    rømerToDelisle ro =
+        let c = (ro - 7.5) * 40/21
+            d = (100 - c) * 3/2
+        in show d ++ " D"
+    
+    rømerToNewton :: Double -> String
+    rømerToNewton ro =
+        let n = (ro - 7.5) * 33/40
+        in show n ++ " N"

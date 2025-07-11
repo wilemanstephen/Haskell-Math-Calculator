@@ -16,8 +16,8 @@ module Hash where
         | m == 0 = error "Can't do modulo by 0"
         | m < 0 = "h(k) = 0"
         | otherwise =
-            let h = split `mod` m
-                split = sum $ splitInteger k 2
+            let split = sum $ splitInteger k 2
+                h = split `mod` m
             in "h(k) = " ++ show h
 
     midSquareMethod :: Int -> Int -> String
@@ -25,18 +25,18 @@ module Hash where
         | m == 0 = error "Can't do modulo by 0"
         | m < 0 = "h(k) = 0"
         | otherwise =
-            let h = middle `mod` m
-                kSquared = k^2
+            let kSquared = k^2
                 middle = middle2Digits kSquared
+                h = middle `mod` m
             in "h(k) = " ++ show h
     
     multiplicativeHashing :: Double -> Double -> String
     multiplicativeHashing k m
         | m < 0 = "h(k) = 0"
         | otherwise =
-            let h = floor (frac * m)
-                a = 0.6180339887
+            let a = 0.6180339887
                 frac = fractionalPart (k * a)
+                h = floor (frac * m)
             in "h(k) = " ++ show h
     
     djb2Hash :: Int -> String -> String

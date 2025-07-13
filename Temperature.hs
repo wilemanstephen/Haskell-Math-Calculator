@@ -1,5 +1,7 @@
 module Temperature where
 
+    import HelperFunctions (extractDouble)
+
     celsiusToFahrenheit :: Double -> String
     celsiusToFahrenheit c =
         let f = c * 9/5 + 32
@@ -12,7 +14,7 @@ module Temperature where
     
     celsiusToRankine :: Double -> String
     celsiusToRankine c =
-        let k = c + 273.15
+        let k = extractDouble $ celsiusToKelvin c
             r = k * 9/5   
         in show r ++ " R"
 
@@ -43,7 +45,7 @@ module Temperature where
 
     fahrenheitToKelvin :: Double -> String
     fahrenheitToKelvin f =
-        let r = f + 459.67
+        let r = extractDouble $ fahrenheitToRankine f
             k = r * 5/9
         in show k ++ " K"
     
@@ -79,7 +81,7 @@ module Temperature where
     
     kelvinToFahrenheit :: Double -> String
     kelvinToFahrenheit k =
-        let r = k * 9/5
+        let r = extractDouble $ kelvinToRankine k
             f = r - 459.67
         in show f ++ " F"
 
@@ -90,13 +92,13 @@ module Temperature where
     
     kelvinToRéaumur :: Double -> String
     kelvinToRéaumur k =
-        let c = k - 273.15
+        let c = extractDouble $ kelvinToCelsius k
             re = c * 0.8
         in show re ++ " Ré"
     
     kelvinToRømer :: Double -> String
     kelvinToRømer k =
-        let c = k - 273.15
+        let c = extractDouble $ kelvinToCelsius k
             ro = c * 21/40 + 7.5
         in show ro ++ " Rø"
     
@@ -107,14 +109,13 @@ module Temperature where
 
     kelvinToNewton :: Double -> String
     kelvinToNewton k =
-        let c = k - 273.15
+        let c = extractDouble $ kelvinToCelsius k
             n = c * 33/100
         in show n ++ " N"
     
     rankineToCelsius :: Double -> String
     rankineToCelsius r =
-        let f = r - 459.67
-            c = f * 5/9
+        let c = (r - 491.67) * 5/9
         in show c ++ " C"
     
     rankineToFahrenheit :: Double -> String
@@ -159,14 +160,13 @@ module Temperature where
     
     réaumurToKelvin :: Double -> String
     réaumurToKelvin re =
-        let c = re * 1.25
+        let c = extractDouble $ réaumurToCelsius re
             k = c + 273.15
         in show k ++ " K"
     
     réaumurToRankine :: Double -> String
     réaumurToRankine re =
-        let c = re * 1.25
-            k = c + 273.15
+        let k = extractDouble $ réaumurToKelvin re
             r = k * 9/5
         in show r ++ " R"
     
@@ -177,7 +177,7 @@ module Temperature where
     
     réaumurToDelisle :: Double -> String
     réaumurToDelisle re =
-        let c = re * 1.25
+        let c = extractDouble $ réaumurToCelsius re
             d = (100 - c) * 3/2
         in show d ++ " D"
     
@@ -198,7 +198,7 @@ module Temperature where
     
     rømerToKelvin :: Double -> String
     rømerToKelvin ro =
-        let c = (ro - 7.5) * 40/21
+        let c = extractDouble $ rømerToCelsius ro
             k = c + 273.15
         in show k ++ " K"
 
@@ -214,7 +214,7 @@ module Temperature where
     
     rømerToDelisle :: Double -> String
     rømerToDelisle ro =
-        let c = (ro - 7.5) * 40/21
+        let c = extractDouble $ rømerToCelsius ro
             d = (100 - c) * 3/2
         in show d ++ " D"
     
@@ -222,3 +222,77 @@ module Temperature where
     rømerToNewton ro =
         let n = (ro - 7.5) * 33/40
         in show n ++ " N"
+    
+    delisleToCelsius :: Double -> String
+    delisleToCelsius d =
+        let c = 100 - d * 2/3
+        in show c ++ " C"
+
+    delisleToFahrenheit :: Double -> String
+    delisleToFahrenheit d =
+        let f = 212 - d * 1.2
+        in show f ++ " F"
+
+    delisleToKelvin :: Double -> String
+    delisleToKelvin d =
+        let k = 373.15 - d * 2/3
+        in show k ++ " K"
+    
+    delisleToRankine :: Double -> String
+    delisleToRankine d =
+        let r = 671.67 - d * 1.2
+        in show r ++ " R"
+    
+    delisleToRéaumur :: Double -> String
+    delisleToRéaumur d =
+        let c = extractDouble $ delisleToCelsius d
+            re = c * 0.8
+        in show re ++ " Ré"
+    
+    delisleToRømer :: Double -> String
+    delisleToRømer d =
+        let c = extractDouble $ delisleToCelsius d
+            ro = c * 21/40 + 7.5
+        in show ro ++ " Rø"
+    
+    delisleToNewton :: Double -> String
+    delisleToNewton d =
+        let n = celsiusToNewton $ extractDouble $ delisleToCelsius d
+        in show n ++ " N"
+    
+    newtonToCelsius :: Double -> String
+    newtonToCelsius n =
+        let c = n * 100/33
+        in show c ++ " C"
+
+    newtonToFahrenheit :: Double -> String
+    newtonToFahrenheit n =
+        let f = n * 60/11 + 32
+        in show f ++ " F"
+
+    newtonToKelvin :: Double -> String
+    newtonToKelvin n =
+        let k = celsiusToKelvin $ extractDouble $ newtonToCelsius n
+        in show k ++ " K"
+    
+    newtonToRankine :: Double -> String
+    newtonToRankine n =
+        let k = extractDouble $ newtonToKelvin n
+            r = k * 9/5
+        in show r ++ " R"
+
+    newtonToRéaumur :: Double -> String
+    newtonToRéaumur n =
+        let re = n * 80/33
+        in show re ++ " Ré"
+    
+    newtonToRømer :: Double -> String
+    newtonToRømer n =
+        let ro = n * 40/33 + 7.5
+        in show ro ++ " Rø"
+    
+    newtonToDelisle :: Double -> String
+    newtonToDelisle n =
+        let c = extractDouble $ newtonToCelsius n
+            d = (100 - c) * 3/2
+        in show d ++ " D"

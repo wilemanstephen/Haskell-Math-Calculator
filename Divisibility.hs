@@ -1,6 +1,6 @@
 module Divisibility where
 
-    import RedefinedFunctionsFromPrelude
+    import  HelperFunctions (isqrt)
 
     isPrime :: Integer -> Bool
     isPrime n

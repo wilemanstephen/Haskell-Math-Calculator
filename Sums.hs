@@ -1,8 +1,8 @@
 module Sums where
 
-    import RedefinedFunctionsFromPrelude
-    import FibonacciCreator
-    import Divisibility
+    import HelperFunctions (redefineLength, redefineTake)
+    import FibonacciCreator (fibonacciNumber, fibonacciList)
+    import Divisibility (isPrime, primeList)
 
     gaussianSum :: Integer -> Integer -> Integer
     gaussianSum 0 k = 0

@@ -1,6 +1,6 @@
 module Hash where
 
-    import RedefinedFunctionsFromPrelude (splitInteger, fromDigits, middle2Digits, fractionalPart)
+    import HelperFunctions (splitInteger, fromDigits, middle2Digits, fractionalPart)
     import Data.Char (ord)
 
     moduloHashing :: Int -> Int -> String

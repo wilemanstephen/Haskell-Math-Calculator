@@ -12,7 +12,7 @@ module HelperFunctions where
     redefineTake i xs | i <= 0 = []
     redefineTake i (x:xs) = x : redefineTake (i-1) xs
 
-    isqrt :: Integer -> Integer 
+    isqrt :: Integer -> Integer
     isqrt = floor.sqrt.fromIntegral
 
     splitInteger :: Int -> Int -> [Int]
@@ -24,7 +24,7 @@ module HelperFunctions where
                 chunk :: Int -> [a] -> [[a]]
                 chunk _ [] = []
                 chunk k xs = take k xs : chunk k (drop k xs)
-    
+
     fromDigits :: [Int] -> Int
     fromDigits = foldl (\acc d -> acc * 10 + d) 0
 
@@ -36,7 +36,7 @@ module HelperFunctions where
             where
                 digits = map digitToInt $ show (abs n)
                 len = length digits
-    
+
     fractionalPart :: RealFrac a => a -> a
     fractionalPart x = snd (properFraction x)
 

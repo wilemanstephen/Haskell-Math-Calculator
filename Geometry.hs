@@ -168,11 +168,12 @@ module Geometry where
         where
             [leg1, leg2] = take 2 (sort [sideA t, sideB t, sideC t])
 
-    heightFromPoint :: Triangle -> Double -> (Double, Double, Double)
-    heightFromPoint t area
+    heightFromPoint :: Triangle -> (Double, Double, Double)
+    heightFromPoint t 
         | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
         | otherwise =
-            let hA = (2*area)/a
+            let area = heronsFormulaArea t
+                hA = (2*area)/a
                 hB = (2*area)/b
                 hC = (2*area)/c
             in (hA, hB, hC)

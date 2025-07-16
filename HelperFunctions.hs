@@ -1,7 +1,7 @@
 module HelperFunctions where
 
     import Data.Char (digitToInt)
-    import Data.List (genericLength)
+    import Data.List (genericLength, sort)
 
     redefineLength :: [Double] -> Double
     redefineLength [] = 0
@@ -42,3 +42,8 @@ module HelperFunctions where
 
     extractDouble :: String -> Double
     extractDouble s = read (head (words s)) :: Double
+
+    conversionFromListToTupleWith2Elems :: Ord a => [a] -> (a, a)
+    conversionFromListToTupleWith2Elems [x, y] = 
+        let [a, b] = sort [x, y]
+        in (a, b)

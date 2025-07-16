@@ -1,7 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Geometry where
+
     import Data.List (sort)
+    import Prelude hiding (length)
+    import HelperFunctions (conversionFromListToTupleWith2Elems)
 
     newtype Angles = Angles Double deriving (Show, Eq, Ord, Num, Fractional, Floating)
 
@@ -54,8 +57,8 @@ module Geometry where
 
     checkIfValidTriangle :: Triangle -> Bool
     checkIfValidTriangle t
-        | a <= 0 && b <= 0 && c <= 0 = False
-        | (bac + abc + bca > 180) && (bac <= 0 || abc <= 0 || bca <= 0) = False
+        | any (<= 0) [a, b, c] = False
+        | (bac + abc + bca > 180) && any (<= 0) [bac, abc, bca] = False
         | otherwise = True
         where
             a = sideA t
@@ -68,7 +71,7 @@ module Geometry where
     checkIfRightTriangle :: Triangle -> Bool
     checkIfRightTriangle t
         | not (checkIfValidTriangle t) = False
-        | (bac == pi/2 || abc == pi/2 || bca == pi/2) && hypotenuse**2 == leg1**2 + leg2**2 = True
+        | elem (pi/2) [bac, abc, bca] && hypotenuse**2 == leg1**2 + leg2**2 = True
         | otherwise = False
         where
             [leg1, leg2, hypotenuse] = sort [sideA t, sideB t, sideC t]
@@ -79,7 +82,7 @@ module Geometry where
     checkIfEquilateralTriangle :: Triangle -> Bool
     checkIfEquilateralTriangle t
         | not (checkIfValidTriangle t) = False
-        | (bac == pi/3 && abc == pi/3 && bca == pi/3) && (a == b && b == c && a == c) = True
+        | all (== pi/3) [bac, abc, bca] && (a == b && b == c && a == c) = True
         | otherwise = False
         where
             a = sideA t
@@ -157,6 +160,14 @@ module Geometry where
             b = sideB t
             bca = angleC t
 
+    areaOfRightTriangle :: Triangle -> Double
+    areaOfRightTriangle t
+        | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
+        | not (checkIfRightTriangle t) = error " For this formula to work, the triangle needs to be a right angled triangle"
+        | otherwise = (leg1 * leg2)/2
+        where
+            [leg1, leg2] = take 2 (sort [sideA t, sideB t, sideC t])
+
     heightFromPoint :: Triangle -> Double -> (Double, Double, Double)
     heightFromPoint t area
         | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
@@ -189,5 +200,68 @@ module Geometry where
             b = sideB t
             c = sideC t
             hypotenuse = maximum [a, b, c]
-    
 
+    data Parallelogram = Parallelogram {
+        lengthP :: Double,
+        widthP :: Double,
+        angleACP :: Angles,
+        angleBDP :: Angles
+    } deriving Show
+
+    checkIfParallelogram :: Parallelogram -> Bool
+    checkIfParallelogram p
+        | any (<= 0) [l, w] = False
+        | any (< 0) [bac, bca]  = False
+        | bac + bca /= pi = False
+        | 2 * bac + 2 * bca /= 2*pi = False
+        | otherwise = True
+        where
+            l = lengthP p
+            w = widthP p
+            bac = angleACP p
+            bca = angleBDP p
+
+    perimeterOfParallelogram :: Parallelogram -> Double
+    perimeterOfParallelogram p
+        | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
+        | otherwise = 2 * (l + w)
+        where
+            l = lengthP p
+            w = widthP p
+
+    areaOfParallelogramUsingHeight :: Parallelogram -> Double -> Double
+    areaOfParallelogramUsingHeight p h
+        | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
+        | otherwise = base * h
+        where
+            base = max (lengthP p) (widthP p)
+
+    areaOfParallelogramUsingAngle1 :: Parallelogram -> Double
+    areaOfParallelogramUsingAngle1 p
+        | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
+        | otherwise = a * b * sin (getAngle abc)
+        where
+            a = lengthP p
+            b = widthP p
+            abc = angleBDP p
+
+    areaOfParallelogramUsingAngle2 :: Parallelogram -> Double
+    areaOfParallelogramUsingAngle2 p
+        | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
+        | otherwise = a * b * sin (getAngle bca)
+        where
+            a = lengthP p
+            b = widthP p
+            bca = angleACP p
+
+    findDiagonalsParallelogram :: Parallelogram -> (Double, Double)
+    findDiagonalsParallelogram p
+        | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
+        | otherwise =
+            let d1 = sqrt (l**2 + w**2 + 2*l*w*cos(getAngle abc))
+                d2 = l * w * 2*l*w*cos(getAngle bca)
+            in conversionFromListToTupleWith2Elems $ sort [d1, d2]
+        where
+            l = lengthP p
+            w = widthP p
+            [abc, bca] = sort [angleACP p, angleBDP p]

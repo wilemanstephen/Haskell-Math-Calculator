@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Geometry where
+    import Data.List (sort)
 
     newtype Angles = Angles Double deriving (Show, Eq, Ord, Num, Fractional, Floating)
 
@@ -17,13 +18,13 @@ module Geometry where
         | not (checkIfValidAngle ang) = False
         | ang < pi/2 = True
         | otherwise = False
-    
+
     checkIfRightAngle :: Angles -> Bool
     checkIfRightAngle ang
         | not (checkIfValidAngle ang) = False
         | ang == pi/2 = True
         | otherwise = False
-    
+
     checkIfObtuseAngle :: Angles -> Bool
     checkIfObtuseAngle ang
         | not (checkIfValidAngle ang) = False
@@ -70,9 +71,7 @@ module Geometry where
         | (bac == pi/2 || abc == pi/2 || bca == pi/2) && hypotenuse**2 == leg1**2 + leg2**2 = True
         | otherwise = False
         where
-            leg1 = sideA t
-            leg2 = sideB t
-            hypotenuse = sideC t
+            [leg1, leg2, hypotenuse] = sort [sideA t, sideB t, sideC t]
             bac = angleA t
             abc = angleB t
             bca = angleC t
@@ -157,3 +156,38 @@ module Geometry where
             a = sideA t
             b = sideB t
             bca = angleC t
+
+    heightFromPoint :: Triangle -> Double -> (Double, Double, Double)
+    heightFromPoint t area
+        | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
+        | otherwise =
+            let hA = (2*area)/a
+                hB = (2*area)/b
+                hC = (2*area)/c
+            in (hA, hB, hC)
+        where
+            a = sideA t
+            b = sideB t
+            c = sideC t
+
+    inradiusOfTriangle :: Triangle -> Double
+    inradiusOfTriangle t
+        | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
+        | otherwise =
+            let s = perimeterOfTriangle t / 2
+                area = heronsFormulaArea t
+                r = area/s
+            in r
+
+    circumradiusOfTriangle :: Triangle -> Double
+    circumradiusOfTriangle t
+        | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
+        | checkIfRightTriangle t = hypotenuse / 2
+        | otherwise = (a * b * c) / (4 * areaOfTriangleUsingAngle t)
+        where
+            a = sideA t
+            b = sideB t
+            c = sideC t
+            hypotenuse = maximum [a, b, c]
+    
+

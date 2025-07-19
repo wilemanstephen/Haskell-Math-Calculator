@@ -3,8 +3,7 @@
 module Geometry where
 
     import Data.List (sort)
-    import Prelude hiding (length)
-    import HelperFunctions (conversionFromListToTupleWith2Elems)
+    import HelperFunctions (conversionFromListToTupleWith2Elems, sum2ElemTuple, checkIf2ndElemBiggerInTuple2Elem)
 
     newtype Angles = Angles Double deriving (Show, Eq, Ord, Num, Fractional, Floating)
 
@@ -19,31 +18,31 @@ module Geometry where
     checkIfAcuteAngle :: Angles -> Bool
     checkIfAcuteAngle ang
         | not (checkIfValidAngle ang) = False
-        | ang < pi/2 = True
+        | ang < pi/2 || ang < 90 = True
         | otherwise = False
 
     checkIfRightAngle :: Angles -> Bool
     checkIfRightAngle ang
         | not (checkIfValidAngle ang) = False
-        | ang == pi/2 = True
+        | ang == pi/2 || ang == 90 = True
         | otherwise = False
 
     checkIfObtuseAngle :: Angles -> Bool
     checkIfObtuseAngle ang
         | not (checkIfValidAngle ang) = False
-        | ang > pi/2 && ang <= pi = True
+        | (ang > pi/2 && ang <= pi) || (ang > 90 && ang <= 180) = True
         | otherwise = False
 
     checkIfStraightAngle :: Angles -> Bool
     checkIfStraightAngle ang
         | not (checkIfValidAngle ang) = False
-        | ang == pi = True
+        | ang == pi || ang == 180 = True
         | otherwise = False
 
     checkIfReflexAngle :: Angles -> Bool
     checkIfReflexAngle ang
         | not (checkIfValidAngle ang) = False
-        | ang > pi && ang < 2*pi = True
+        | (ang > pi && ang < 2*pi) || (ang > 180 && ang < 360) = True
         | otherwise = False
 
     data Triangle = Triangle {
@@ -58,7 +57,7 @@ module Geometry where
     checkIfValidTriangle :: Triangle -> Bool
     checkIfValidTriangle t
         | any (<= 0) [a, b, c] = False
-        | (bac + abc + bca > 180) && any (<= 0) [bac, abc, bca] = False
+        | (bac + abc + bca > 180 || bac + abc + bca > pi) && any (<= 0) [bac, abc, bca] = False
         | otherwise = True
         where
             a = sideA t
@@ -71,7 +70,7 @@ module Geometry where
     checkIfRightTriangle :: Triangle -> Bool
     checkIfRightTriangle t
         | not (checkIfValidTriangle t) = False
-        | elem (pi/2) [bac, abc, bca] && hypotenuse**2 == leg1**2 + leg2**2 = True
+        | (elem (pi/2) [bac, abc, bca] || elem 90 [bac, abc, bca]) && hypotenuse**2 == leg1**2 + leg2**2 = True
         | otherwise = False
         where
             [leg1, leg2, hypotenuse] = sort [sideA t, sideB t, sideC t]
@@ -82,7 +81,7 @@ module Geometry where
     checkIfEquilateralTriangle :: Triangle -> Bool
     checkIfEquilateralTriangle t
         | not (checkIfValidTriangle t) = False
-        | all (== pi/3) [bac, abc, bca] && (a == b && b == c && a == c) = True
+        | (all (== pi/3) [bac, abc, bca] || all (== 60) [bac, abc, bca]) && (a == b && b == c && a == c) = True
         | otherwise = False
         where
             a = sideA t
@@ -169,7 +168,7 @@ module Geometry where
             [leg1, leg2] = take 2 (sort [sideA t, sideB t, sideC t])
 
     heightFromPoint :: Triangle -> (Double, Double, Double)
-    heightFromPoint t 
+    heightFromPoint t
         | not (checkIfValidTriangle t) = error "Triangle with negative or no side length at all does not exist"
         | otherwise =
             let area = heronsFormulaArea t
@@ -259,10 +258,111 @@ module Geometry where
     findDiagonalsParallelogram p
         | not (checkIfParallelogram p) = error "Not a parallelogram, just a 4 sided regular shape, or non-existent shape"
         | otherwise =
-            let d1 = sqrt (l**2 + w**2 + 2*l*w*cos(getAngle abc))
-                d2 = l * w * 2*l*w*cos(getAngle bca)
+            let d1 = sqrt (l**2 + w**2 + 2*l*w*cos (getAngle abc))
+                d2 = l * w * 2*l*w*cos (getAngle bca)
             in conversionFromListToTupleWith2Elems $ sort [d1, d2]
         where
             l = lengthP p
             w = widthP p
             [abc, bca] = sort [angleACP p, angleBDP p]
+
+    data Rectangle = Rectangle {
+        widthR :: Double,
+        lengthR :: Double,
+        angleR :: Angles
+    }
+
+    checkIfRectangle :: Rectangle -> Bool
+    checkIfRectangle r
+        | ang == 90 || ang == pi/2 = True
+        | l /= w = True
+        | otherwise = False
+        where
+            ang = angleR r
+            l = lengthR r
+            w = widthR r
+
+    perimeterOfRectangle :: Rectangle -> Double
+    perimeterOfRectangle r
+        | not (checkIfRectangle r) = error "Not a valid rectangle"
+        | otherwise = 2*(l+w)
+        where
+            l = lengthR r
+            w = widthR r
+
+    areaOfRectangle :: Rectangle -> Double
+    areaOfRectangle r
+        | not (checkIfRectangle r) = error "Not a valid rectangle"
+        | otherwise = l * w
+        where
+            l = lengthR r
+            w = widthR r
+
+    findDiagonalsRectangle :: Rectangle -> Double
+    findDiagonalsRectangle r
+        | not (checkIfRectangle r) = error "Not a valid rectangle"
+        | otherwise = sqrt (l**2 + w**2)
+        where
+            l = lengthR r
+            w = widthR r
+
+    circumradiusOfRectangle :: Rectangle -> Double
+    circumradiusOfRectangle r
+        | not (checkIfRectangle r) = error "Not a valid rectangle"
+        | otherwise = findDiagonalsRectangle r / 2
+
+    data Rhombus = Rhombus {
+        sideRh :: Double,
+        angle1Rh :: Angles,
+        angle2Rh :: Angles
+    }
+
+    checkIfRhombus :: Rhombus -> Bool
+    checkIfRhombus rh
+        | dab /= abc = True
+        | checkIf2ndElemBiggerInTuple2Elem $ diagonalsOfRhombus rh = True
+        | otherwise = False
+        where
+            dab = angle1Rh rh
+            abc = angle2Rh rh
+
+    perimeterOfRhombus :: Rhombus -> Double
+    perimeterOfRhombus rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise = 4 * sideRh rh
+
+    findHeightRhombus :: Rhombus -> Double
+    findHeightRhombus rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise = sideRh rh * sin (getAngle dab)
+        where
+            dab = angle1Rh rh
+
+    areaOfRhombusUsingHeight :: Rhombus -> Double
+    areaOfRhombusUsingHeight rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise = sideRh rh * findHeightRhombus rh
+
+    diagonalsOfRhombus :: Rhombus -> (Double, Double)
+    diagonalsOfRhombus rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise =
+            let d1 = 2 * sideRh rh * sin (getAngle dab / 2)
+                d2 = 2 * sideRh rh * cos (getAngle dab / 2)
+            in conversionFromListToTupleWith2Elems $ sort [d1, d2]
+        where
+            dab = angle1Rh rh
+
+    areaOfRhombusUsingDiagonals :: Rhombus -> Double
+    areaOfRhombusUsingDiagonals rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise = 1/2 * sum2ElemTuple (diagonalsOfRhombus rh)
+
+    areaOfRhombusUsingAngles :: Rhombus -> Double
+    areaOfRhombusUsingAngles rh
+        | not (checkIfRhombus rh) = error "Not valid rhombus"
+        | otherwise = sideRh rh ^ 2 * sin (getAngle dab)
+        where
+            dab = angle1Rh rh
+    
+    

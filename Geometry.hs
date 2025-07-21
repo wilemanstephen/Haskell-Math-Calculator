@@ -274,7 +274,7 @@ module Geometry where
 
     checkIfRectangle :: Rectangle -> Bool
     checkIfRectangle r
-        | ang == 90 || ang == pi/2 = True
+        | ang /= 90 || ang /= pi/2 = False
         | l /= w = True
         | otherwise = False
         where
@@ -319,7 +319,7 @@ module Geometry where
 
     checkIfRhombus :: Rhombus -> Bool
     checkIfRhombus rh
-        | dab /= abc = True
+        | dab == abc = False
         | checkIf2ndElemBiggerInTuple2Elem $ diagonalsOfRhombus rh = True
         | otherwise = False
         where
@@ -364,5 +364,103 @@ module Geometry where
         | otherwise = sideRh rh ^ 2 * sin (getAngle dab)
         where
             dab = angle1Rh rh
-    
-    
+
+    data Square = Square {
+        sideS :: Double,
+        angleS :: Angles
+    }
+
+    checkIfSquare :: Square -> Bool
+    checkIfSquare s
+        | angleS s == pi/2 || angleS s == 90 = True
+        | otherwise = False
+
+    perimeterOfSquare :: Square -> Double
+    perimeterOfSquare s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = 4 * sideS s
+
+    areaOfSquareUsingSides :: Square -> Double
+    areaOfSquareUsingSides s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = sideS s ** 2
+
+    areaOfSquareUsingDiagonals :: Square -> Double
+    areaOfSquareUsingDiagonals s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = findDiagonalsSquare s ** 2 / 2
+
+    findDiagonalsSquare :: Square -> Double
+    findDiagonalsSquare s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = sideS s * sqrt 2
+
+    inradiusOfSquare :: Square -> Double
+    inradiusOfSquare s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = sideS s / 2
+
+    circumradiusOfSquareUsingSides :: Square -> Double
+    circumradiusOfSquareUsingSides s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = sideS s / sqrt 2
+
+    circumradiusOfSquareUsingDiagonals :: Square -> Double
+    circumradiusOfSquareUsingDiagonals s
+        | not (checkIfSquare s) = error "Not a valid square"
+        | otherwise = findDiagonalsSquare s / 2
+
+    data Trapezium = Trapezium {
+        legATr :: Double,
+        legBTr :: Double,
+        bottomBaseTr :: Double,
+        upperBaseTr :: Double,
+        angleATr :: Angles,
+        angleBTr :: Angles,
+        angleCTr :: Angles,
+        angleDTr :: Angles
+    }
+
+    checkIfValidTrapezium :: Trapezium -> Bool
+    checkIfValidTrapezium tr
+        | b1 == b2 = False
+        | any (> 180) [dab, abc, bcd, cda] && any (< 0) [dab, abc, bcd, cda] = False
+        | dab + abc /= 180 && bcd + cda /= 180 = False
+        | otherwise = True
+        where
+            b1 = upperBaseTr tr
+            b2 = bottomBaseTr tr
+            dab = angleATr tr
+            abc = angleBTr tr
+            bcd = angleCTr tr
+            cda = angleDTr tr
+    checkIfIsoscelesTrapezium :: Trapezium -> Bool
+    checkIfIsoscelesTrapezium tr
+        | not (checkIfValidTrapezium tr) = False
+        | leg1 /= leg2 = False
+        | dab /= cda && abc /= bcd = False
+        | otherwise = True
+        where
+            leg1 = legATr tr
+            leg2 = legBTr tr
+            dab = angleATr tr
+            abc = angleBTr tr
+            bcd = angleCTr tr
+            cda = angleDTr tr
+
+    checkIfRightTrapezium :: Trapezium -> Bool
+    checkIfRightTrapezium tr
+        | not (checkIfValidTrapezium tr) = False
+        | 90 `elem` [dab, abc, bcd, cda] || pi/2 `elem` [dab, abc, bcd, cda] = True
+        | otherwise = False
+        where
+            dab = angleATr tr
+            abc = angleBTr tr
+            bcd = angleCTr tr
+            cda = angleDTr tr
+
+    checkIfIsoscelesRightTrapezium :: Trapezium -> Bool
+    checkIfIsoscelesRightTrapezium tr
+        | not (checkIfValidTrapezium tr) = False
+        | checkIfIsoscelesTrapezium tr && checkIfRightTrapezium tr = True
+        | otherwise = False

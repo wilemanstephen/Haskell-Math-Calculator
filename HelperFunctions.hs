@@ -58,3 +58,8 @@ module HelperFunctions where
 
     checkIfSameList :: (Eq a, Ord a) => [a] -> [a] -> Bool
     checkIfSameList xs ys = sort xs == sort ys
+
+    checkIfAllElems :: Ord a => [a] -> [a] -> Bool
+    checkIfAllElems [] _ = True
+    checkIfAllElems _ [] = False
+    checkIfAllElems xs ys = all (`elem` ys) xs

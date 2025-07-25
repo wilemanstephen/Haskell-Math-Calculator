@@ -464,3 +464,4 @@ module Geometry where
         | not (checkIfValidTrapezium tr) = False
         | checkIfIsoscelesTrapezium tr && checkIfRightTrapezium tr = True
         | otherwise = False
+    

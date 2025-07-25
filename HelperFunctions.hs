@@ -44,14 +44,17 @@ module HelperFunctions where
     extractDouble s = read (head (words s)) :: Double
 
     conversionFromListToTupleWith2Elems :: Ord a => [a] -> (a, a)
-    conversionFromListToTupleWith2Elems [x, y] = 
+    conversionFromListToTupleWith2Elems [x, y] =
         let [a, b] = sort [x, y]
         in (a, b)
 
     sum2ElemTuple :: (Double, Double) -> Double
     sum2ElemTuple (x, y) = x + y
-    
+
     checkIf2ndElemBiggerInTuple2Elem :: (Double, Double) -> Bool
     checkIf2ndElemBiggerInTuple2Elem (x, y)
         | x < y = True
         | otherwise = False
+
+    checkIfSameList :: (Eq a, Ord a) => [a] -> [a] -> Bool
+    checkIfSameList xs ys = sort xs == sort ys

@@ -1,6 +1,6 @@
 module SetTheory where
 
-    import Data.List (nub)
+    import Data.List (nub, sort)
     import HelperFunctions (checkIfSameList, checkIfAllElems)
 
     isElemSet :: Eq a => a -> [a] -> Bool
@@ -18,22 +18,29 @@ module SetTheory where
         | otherwise = False
 
 
-    union :: (Eq a, Ord a) => [a] -> [a] -> [a]
+    union :: Eq a => [a] -> [a] -> [a]
     union [] l2 = nub l2
     union l1 [] = nub l1
     union l1 l2 = nub (l1 ++ l2)
 
-    intersection :: (Eq a, Ord a) => [a] -> [a] -> [a]
+    intersection :: Eq a => [a] -> [a] -> [a]
     intersection [] _ = []
     intersection _ [] = []
-    intersection (x:xs) (y:ys) = if x `elem` (y:ys) then nub (x : intersection xs (y:ys)) else intersection xs (y:ys)
+    intersection (x:xs) (y:ys) = if isElemSet x (y:ys) then nub $ x : intersection xs (y:ys) else intersection xs (y:ys)
 
     difference :: (Eq a, Ord a) => [a] -> [a] -> [a]
     difference [] _ = []
     difference (x:xs) [] = nub (x:xs)
     difference (x:xs) (y:ys) 
         | checkIfSameList (nub (x:xs)) (nub (y:ys)) = []
-        | x `elem` (y:ys) = difference xs (y:ys)
+        | isElemSet x (y:ys) = difference xs (y:ys)
         | otherwise = nub (x : difference xs (y:ys))
     
+    cardinality :: [a] -> Int
+    cardinality = length
     
+    complement :: (Eq a, Num a, Enum a) => [a] -> [a]
+    complement xs = [x | x <- [0..], x `notElem` xs]
+
+    symmetricDifference :: (Eq a, Ord a) => [a] -> [a] -> [a]
+    symmetricDifference xs ys = sort $ nub $ difference xs ys ++ difference ys xs
